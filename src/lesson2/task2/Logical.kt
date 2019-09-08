@@ -73,3 +73,4 @@ fun circleInside(
 fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean = a <= r && b <= s || b <= r && a <= s ||
         b <= r && c <= s || c <= r && b <= s ||
         a <= r && c <= s || c <= r && a <= s
+
