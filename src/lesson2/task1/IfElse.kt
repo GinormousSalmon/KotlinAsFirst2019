@@ -3,8 +3,7 @@
 package lesson2.task1
 
 import lesson1.task1.discriminant
-import kotlin.math.max
-import kotlin.math.sqrt
+import kotlin.math.*
 
 /**
  * Пример
@@ -84,7 +83,14 @@ fun timeForHalfWay(
     t1: Double, v1: Double,
     t2: Double, v2: Double,
     t3: Double, v3: Double
-): Double = TODO()
+): Double {
+    val distance = v1 * t1 + v2 * t2 + v3 * t3
+    return when {
+        v1 * t1 >= distance / 2 -> distance / 2 / v1
+        v1 * t1 + v2 * t2 >= distance / 2 -> t1 + (distance / 2 - v1 * t1) / v2
+        else -> t1 + t2 + (distance / 2 - v1 * t1 - v2 * t2) / v3
+    }
+}
 
 /**
  * Простая
@@ -99,7 +105,14 @@ fun whichRookThreatens(
     kingX: Int, kingY: Int,
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
-): Int = TODO()
+): Int {
+    var answer = 0
+    if (kingX == rookX1 || kingY == rookY1)
+        answer++
+    if (kingX == rookX2 || kingY == rookY2)
+        answer += 2
+    return answer
+}
 
 /**
  * Простая
@@ -115,7 +128,14 @@ fun rookOrBishopThreatens(
     kingX: Int, kingY: Int,
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
-): Int = TODO()
+): Int {
+    var answer = 0
+    if (kingX == rookX || kingY == rookY)
+        answer++
+    if (abs(kingX - bishopX) == abs(kingY - bishopY))
+        answer += 2
+    return answer
+}
 
 /**
  * Простая
@@ -125,7 +145,18 @@ fun rookOrBishopThreatens(
  * прямоугольным (вернуть 1) или тупоугольным (вернуть 2).
  * Если такой треугольник не существует, вернуть -1.
  */
-fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
+fun triangleKind(A: Double, B: Double, C: Double): Int {
+    val edges = arrayListOf(A, B, C).sorted()
+    val a = edges[2]
+    val b = edges[1]
+    val c = edges[0]
+    return when {
+        a >= b + c -> -1
+        a.pow(2) == b.pow(2) + c.pow(2) -> 1
+        acos((b.pow(2) + c.pow(2) - a.pow(2)) / (2 * b * c)) / PI * 180 > 90 -> 2
+        else -> 0
+    }
+}
 
 /**
  * Средняя
@@ -135,4 +166,16 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
  * Найти длину пересечения отрезков AB и CD.
  * Если пересечения нет, вернуть -1.
  */
-fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int = TODO()
+
+fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
+    return if (b in c..d) {
+        if (a in c..d)
+            b - a
+        else
+            b - c
+    } else if (a in c..d)
+        d - a
+    else if (c in a..b)
+        d - c
+    else -1
+}
