@@ -68,7 +68,7 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun digitNumber(n: Int): Int {
-    var value: Int = abs(n)
+    var value = abs(n)
     var count = 0
     if (value < 10)
         return 1
@@ -85,21 +85,20 @@ fun digitNumber(n: Int): Int {
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-fun fib(n: Int): Int {
-    return if (n in 1..2)
+fun fib(n: Int): Int =
+    if (n in 1..2)
         1
     else {
         var num = 1
         var old = 1
-        var a: Int
         for (i in 0 until n - 2) {
-            a = num
+            val a = num
             num += old
             old = a
         }
         num
     }
-}
+
 
 /**
  * Простая
@@ -134,12 +133,8 @@ fun minDivisor(n: Int): Int {
  *
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
-fun maxDivisor(n: Int): Int {
-    var del = n - 1
-    while (n % del != 0)
-        del -= 1
-    return del
-}
+fun maxDivisor(n: Int): Int = n / minDivisor(n)
+
 
 /**
  * Простая
@@ -204,16 +199,18 @@ fun collatzSteps(x: Int): Int {
  * Использовать kotlin.math.sin и другие стандартные реализации функции синуса в этой задаче запрещается.
  */
 fun sin(x: Double, eps: Double): Double {
-    var sin = 0.0
-    var item = 1.0
-    var factor = 1
-    var stage = 1
-    val ang = x - (x / (2 * PI)).toInt() * 2 * PI
+    val ang = x % (2 * PI)
+    var sin = ang
+    var item = ang
+    var factor = -1
+    var stage = 3
+    var oldItem = item
     while (abs(item) >= eps) {
-        item = factor * ang.pow(stage) / factorial(stage)
+        item = factor * oldItem * ang.pow(2) / (stage - 1) / stage
         sin += item
         stage += 2
         factor *= -1
+        oldItem = abs(item)
     }
     return sin
 }
@@ -228,16 +225,18 @@ fun sin(x: Double, eps: Double): Double {
  * Использовать kotlin.math.cos и другие стандартные реализации функции косинуса в этой задаче запрещается.
  */
 fun cos(x: Double, eps: Double): Double {
-    var cos = 0.0
+    val ang = x % (2 * PI)
+    var cos = 1.0
     var item = 1.0
-    var factor = 1
-    var stage = 0
-    val ang = x - (x / (2 * PI)).toInt() * 2 * PI
+    var factor = -1
+    var stage = 2
+    var oldItem = item
     while (abs(item) >= eps) {
-        item = factor * ang.pow(stage) / factorial(stage)
+        item = factor * oldItem * ang.pow(2) / (stage - 1) / stage
         cos += item
         stage += 2
         factor *= -1
+        oldItem = abs(item)
     }
     return cos
 }
@@ -273,10 +272,8 @@ fun revert(n: Int): Int {
  */
 fun isPalindrome(n: Int): Boolean {
     val len = digitNumber(n)
-    val a: Int
-    val b: Int
-    a = n % (10.0.pow(len / 2).toInt())
-    b = if (len % 2 == 0)
+    val a = n % (10.0.pow(len / 2).toInt())
+    val b = if (len % 2 == 0)
         n / (10.0.pow(len / 2).toInt())
     else
         n / (10.0.pow(len / 2 + 1).toInt())
@@ -339,12 +336,11 @@ fun squareSequenceDigit(n: Int): Int {
 fun fibSequenceDigit(n: Int): Int {
     var calcVal = 0
     var chain = 0
-    var a: Int
     var old = 1
     if (n == 1)
         return 1
     while (chain < n) {
-        a = calcVal
+        val a = calcVal
         calcVal += old
         old = a
 
