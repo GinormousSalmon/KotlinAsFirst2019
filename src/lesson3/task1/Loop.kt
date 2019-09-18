@@ -202,15 +202,13 @@ fun sin(x: Double, eps: Double): Double {
     val ang = x % (2 * PI)
     var sin = ang
     var item = ang
-    var factor = -1
     var stage = 3
     var oldItem = item
     while (abs(item) >= eps) {
-        item = factor * oldItem * ang.pow(2) / (stage - 1) / stage
+        item = -1 * oldItem * ang.pow(2) / (stage - 1) / stage
         sin += item
         stage += 2
-        factor *= -1
-        oldItem = abs(item)
+        oldItem = item//abs(item)
     }
     return sin
 }
@@ -228,14 +226,12 @@ fun cos(x: Double, eps: Double): Double {
     val ang = x % (2 * PI)
     var cos = 1.0
     var item = 1.0
-    var factor = -1
     var stage = 2
     var oldItem = item
     while (abs(item) >= eps) {
-        item = factor * oldItem * ang.pow(2) / (stage - 1) / stage
+        item = -1 * oldItem * ang.pow(2) / (stage - 1) / stage
         cos += item
         stage += 2
-        factor *= -1
         oldItem = abs(item)
     }
     return cos
