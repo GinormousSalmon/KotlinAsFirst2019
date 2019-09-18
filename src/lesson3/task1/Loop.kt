@@ -224,8 +224,8 @@ fun sin(x: Double, eps: Double): Double {
  */
 fun cos(x: Double, eps: Double): Double {
     val ang = x % (2 * PI)
-    var cos = 1.0
-    var item = 1.0
+    var cos = ang
+    var item = ang
     var stage = 2
     var oldItem = item
     while (abs(item) >= eps) {
