@@ -222,17 +222,18 @@ fun sin(x: Double, eps: Double): Double {
  * Подумайте, как добиться более быстрой сходимости ряда при больших значениях x.
  * Использовать kotlin.math.cos и другие стандартные реализации функции косинуса в этой задаче запрещается.
  */
+
 fun cos(x: Double, eps: Double): Double {
     val ang = x % (2 * PI)
-    var cos = ang
-    var item = ang
+    var cos = 1.0
+    var item = 1.0
     var stage = 2
     var oldItem = item
     while (abs(item) >= eps) {
         item = -1 * oldItem * ang.pow(2) / (stage - 1) / stage
         cos += item
         stage += 2
-        oldItem = abs(item)
+        oldItem = item//abs(item)
     }
     return cos
 }
