@@ -347,7 +347,12 @@ fun firstDuplicateIndex(str: String): Int {
     val data = str.split(" ")
     for (i in 1 until data.size)
         if (data[i - 1].toLowerCase() == data[i].toLowerCase())
-            return str.indexOf(" " + data[i - 1] + " " + data[i] + " ") + 1
+            return if (i == 1)
+                0
+            else if (i == data.size - 1)
+                str.indexOf(" " + data[i - 1] + " " + data[i]) + 1
+            else
+                str.indexOf(" " + data[i - 1] + " " + data[i] + " ") + 1
     return -1
 }
 
@@ -362,7 +367,23 @@ fun firstDuplicateIndex(str: String): Int {
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше либо равны нуля.
  */
-fun mostExpensive(description: String): String = TODO()
+fun mostExpensive(description: String): String {
+    val positions = description.split("; ")
+    var max = Pair<String, Double>("", 0.0)
+    for (i in positions) {
+        val data = i.split(" ")
+        if (data.size != 2)
+            return ""
+        try {
+            val cost = data[1].toDouble()
+            if (cost > max.second)
+                max = Pair(data[0], cost)
+        } catch (e: NumberFormatException) {
+            return ""
+        }
+    }
+    return max.first
+}
 
 /**
  * Сложная
@@ -375,7 +396,62 @@ fun mostExpensive(description: String): String = TODO()
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int = TODO()
+fun fromRoman(roman: String): Int {
+    var str = roman
+    var answer = 0
+    for (i in str) {
+        if (i !in "IVXLCDM")
+            return -1
+    }
+    if (str.contains("CM")) {
+        str = remove(str, "CM")
+        answer += 900
+    }
+    if (str.contains("CD")) {
+        str = remove(str, "CD")
+        answer += 400
+    }
+    if (str.contains("XC")) {
+        str = remove(str, "XC")
+        answer += 90
+    }
+    if (str.contains("XL")) {
+        str = remove(str, "XL")
+        answer += 40
+    }
+    if (str.contains("IX")) {
+        str = remove(str, "IX")
+        answer += 9
+    }
+    if (str.contains("IV")) {
+        str = remove(str, "IV")
+        answer += 4
+    }
+    for (i in str)
+        when (i) {
+            'I' -> answer += 1
+            'V' -> answer += 5
+            'X' -> answer += 10
+            'L' -> answer += 50
+            'C' -> answer += 100
+            'D' -> answer += 500
+            'M' -> answer += 1000
+        }
+    return answer
+}
+
+fun remove(str: String, delete: String): String {
+    var answer = ""
+    if (str.contains(delete)) {
+        val index = str.indexOf(delete)
+        for (i in 0 until index)
+            answer += str[i]
+        for (i in index + delete.length until str.length)
+            answer += str[i]
+        return answer
+    }
+    return str
+}
 
 /**
  * Очень сложная
