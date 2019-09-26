@@ -2,6 +2,11 @@
 
 package lesson6.task1
 
+import lesson2.task2.daysInMonth
+import java.lang.NumberFormatException
+import java.util.*
+import kotlin.math.max
+
 /**
  * Пример
  *
@@ -69,7 +74,39 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    val day: Int
+    val month: String
+    val year: Int
+    val splitted = str.split(" ")
+    if (splitted.size != 3)
+        return ""
+    try {
+        day = splitted[0].toInt()
+        month = when (splitted[1]) {
+            "января" -> "01"
+            "февраля" -> "02"
+            "марта" -> "03"
+            "апреля" -> "04"
+            "мая" -> "05"
+            "июня" -> "06"
+            "июля" -> "07"
+            "августа" -> "08"
+            "сентября" -> "09"
+            "октября" -> "10"
+            "ноября" -> "11"
+            "декабря" -> "12"
+            else -> return ""
+        }
+        year = splitted[2].toInt()
+
+        if (day > daysInMonth(month.toInt(), year))
+            return ""
+    } catch (e: NumberFormatException) {
+        return ""
+    }
+    return (if (day < 10) "0$day" else day.toString()) + ".$month" + "." + year.toString()
+}
 
 /**
  * Средняя
@@ -81,7 +118,38 @@ fun dateStrToDigit(str: String): String = TODO()
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    val day: Int
+    val month: String
+    val year: Int
+    val splitted = digital.split(".")
+    if (splitted.size != 3)
+        return ""
+    try {
+        day = splitted[0].toInt()
+        month = when (splitted[1].toInt()) {
+            1 -> "января"
+            2 -> "февраля"
+            3 -> "марта"
+            4 -> "апреля"
+            5 -> "мая"
+            6 -> "июня"
+            7 -> "июля"
+            8 -> "августа"
+            9 -> "сентября"
+            10 -> "октября"
+            11 -> "ноября"
+            12 -> "декабря"
+            else -> return ""
+        }
+        year = splitted[2].toInt()
+        if (day > daysInMonth(splitted[1].toInt(), year))
+            return ""
+        return "$day $month $year"
+    } catch (e: NumberFormatException) {
+        return ""
+    }
+}
 
 /**
  * Средняя
@@ -97,7 +165,34 @@ fun dateDigitToStr(digital: String): String = TODO()
  *
  * PS: Дополнительные примеры работы функции можно посмотреть в соответствующих тестах.
  */
-fun flattenPhoneNumber(phone: String): String = TODO()
+fun flattenPhoneNumber(phone: String): String {
+    val splitted = clean(phone.split(""))
+    if ("(" in splitted && ")" in splitted)
+        if (splitted.indexOf("(") != splitted.lastIndexOf("(") ||
+            splitted.indexOf(")") != splitted.lastIndexOf(")") ||
+            splitted.indexOf(")") - splitted.indexOf("(") <= 1 ||
+            splitted.indexOf(")") == splitted.size - 1
+        )
+            return ""
+    for (i in splitted.indices) {
+        val item = splitted[i]
+        if (i == 0 && !"+0123456789".contains(item))
+            return ""
+        if (i != 0 && !"0123456789()".contains(item))
+            return ""
+    }
+    splitted.remove("(")
+    splitted.remove(")")
+    return splitted.joinToString("")
+}
+
+fun clean(list: List<String>): MutableList<String> {
+    val result = mutableListOf<String>()
+    for (i in list)
+        if (i !in " -" && i.isNotEmpty())
+            result.add(i)
+    return result
+}
 
 /**
  * Средняя
@@ -109,7 +204,23 @@ fun flattenPhoneNumber(phone: String): String = TODO()
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+fun bestLongJump(jumps: String): Int {
+    val splitted = jumps.split(" ")
+    val nums = mutableListOf<Int>()
+    print("12".contains("12"))
+    for (i in splitted) {
+        try {
+            nums.add(i.toInt())
+        } catch (e: NumberFormatException) {
+            if (i != "%" && i != "-")
+                return -1
+        }
+    }
+    return if (nums.isNotEmpty())
+        nums.max()!!
+    else
+        -1
+}
 
 /**
  * Сложная
@@ -122,7 +233,71 @@ fun bestLongJump(jumps: String): Int = TODO()
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int {
+    val overcome = mutableListOf<Int>()
+    val stack = Stack<String>()
+    val data = mutableListOf<String>()
+    for (i in jumps.split(" "))
+        try {
+            i.toInt()
+            data.add(i)
+        } catch (e: NumberFormatException) {
+            for (j in i.split(""))
+                if (j.isNotEmpty())
+                    if (j != "%" && j != "+" && j != "-")
+                        return -1
+                    else data.add(j)
+        }
+    for (i in data) {
+        if (stack.isEmpty())
+            if (isNumber(i)) {
+                stack.push(i)
+                continue
+            } else return -1
+        if (isNumber(i))
+            when (stack.peek()) {
+                "%" -> return -1
+                "-" -> stack.push(i)
+                "+" -> stack.push(i)
+                else -> return -1
+            }
+        if (i == "%" || i == "+")
+            when (stack.peek()) {
+                "%" -> stack.push(i)
+                "-" -> return -1
+                "+" -> return -1
+                else -> stack.push(i)
+            }
+        if (i == "-")
+            when (stack.peek()) {
+                "%" -> stack.push(i)
+                "-" -> return -1
+                "+" -> return -1
+                else -> return -1
+            }
+    }
+    var old = 0
+    for (i in data) {
+        if (isNumber(i))
+            old = i.toInt()
+        if (i == "+")
+            overcome.add(old)
+    }
+    return if (overcome.isEmpty())
+        -1
+    else
+        overcome.max()!!
+}
+
+
+fun isNumber(data: String): Boolean {
+    try {
+        data.toInt()
+    } catch (e: NumberFormatException) {
+        return false
+    }
+    return true
+}
 
 /**
  * Сложная
