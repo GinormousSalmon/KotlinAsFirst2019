@@ -3,9 +3,10 @@
 package lesson6.task1
 
 import lesson2.task2.daysInMonth
+import java.lang.IllegalArgumentException
 import java.lang.NumberFormatException
 import java.util.*
-import kotlin.math.max
+import kotlin.Exception
 
 /**
  * Пример
@@ -291,6 +292,10 @@ fun bestHighJump(jumps: String): Int {
 
 
 fun isNumber(data: String): Boolean {
+    if (data.isEmpty())
+        return false
+    else if (data[0] == '+' || data[0] == '-')
+        return false
     try {
         data.toInt()
     } catch (e: NumberFormatException) {
@@ -308,7 +313,26 @@ fun isNumber(data: String): Boolean {
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    val data = expression.split(" ")
+    val numbers = mutableListOf<Int>()
+    var old = ""
+    for (i in data) {
+        if (isNumber(i))
+            when {
+                isNumber(old) -> throw IllegalArgumentException()
+                old == "+" || old.isEmpty() -> numbers.add(i.toInt())
+                else -> numbers.add(-1 * i.toInt())
+            }
+        else when (i) {
+            "+" -> require(!(old == "" || old == "+" || old == "-"))
+            "-" -> require(!(old == "+" || old == "-"))
+            else -> throw IllegalArgumentException()
+        }
+        old = i
+    }
+    return numbers.sum()
+}
 
 /**
  * Сложная

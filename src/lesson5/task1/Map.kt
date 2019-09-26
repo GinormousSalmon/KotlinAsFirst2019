@@ -476,6 +476,15 @@ fun getFriends(friends: Map<String, Set<String>>, key: String, stop: List<String
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
+    if (number % 2 == 0) {
+        val a = list.indexOf(number / 2)
+        var b = -1
+        for (i in a + 1 until list.size)
+            if (list[i] == number / 2)
+                b = i
+        if (a != b && b != -1)
+            return Pair(a, b)
+    }
     val numbers = mutableMapOf<Int, Boolean>()
     for (i in list)
         numbers[i] = true
