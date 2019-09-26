@@ -400,7 +400,7 @@ fun fromRoman(roman: String): Int {
     var str = roman
     var answer = 0
     if (str.isEmpty())
-        return 0
+        return -1
     for (i in str) {
         if (i !in "IVXLCDM")
             return -1
