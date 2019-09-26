@@ -369,7 +369,7 @@ fun firstDuplicateIndex(str: String): Int {
  */
 fun mostExpensive(description: String): String {
     val positions = description.split("; ")
-    var max = Pair<String, Double>("", 0.0)
+    var max = Pair<String, Double>("kok", -1.0)
     for (i in positions) {
         val data = i.split(" ")
         if (data.size != 2)
@@ -399,6 +399,8 @@ fun mostExpensive(description: String): String {
 fun fromRoman(roman: String): Int {
     var str = roman
     var answer = 0
+    if (str.isEmpty())
+        return 0
     for (i in str) {
         if (i !in "IVXLCDM")
             return -1
