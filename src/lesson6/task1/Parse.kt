@@ -446,5 +446,8 @@ fun remove(str: String, delete: String): String {
  * IllegalArgumentException.
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
- */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+ */  // */<>+-[]
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    require(Regex("""(([<>\-+]+)*((\[[<>\-+]+])+)*)+""").matches(commands))
+    return listOf()
+}
