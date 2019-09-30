@@ -308,7 +308,6 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean = chars.containsAll(w
  */
 fun extractRepeats(list: List<String>): Map<String, Int> {
     val answer = mutableMapOf<String, Int>()
-    val toDelete = mutableListOf<String>()
     for (i in list)
         answer[i] = answer.getOrDefault(i, 0) + 1
     return answer.filter { it.value > 1 }
@@ -465,9 +464,12 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
             numbers[list[i]] = mutableListOf(i)
         else
             numbers[list[i]]!!.add(i)
-    for (i in 0 until ceil(number / 2.0).toInt())
+    for (i in 0 until ceil(number / 2.0).toInt() + if (number == 0) 1 else 0) {
         if (numbers[i] != null && numbers[number - i] != null)
-            return Pair(list.indexOf(i), list.indexOf(number - i))
+            return if (i == number - i)
+                Pair(numbers[i]!![0], numbers[number - i]!![1])
+            else Pair(numbers[i]!![0], numbers[number - i]!![0])
+    }
     return Pair(-1, -1)
 }
 
