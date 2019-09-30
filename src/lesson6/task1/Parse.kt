@@ -6,7 +6,7 @@ import lesson2.task2.daysInMonth
 import java.lang.IllegalArgumentException
 import java.lang.NumberFormatException
 import java.util.*
-import kotlin.Exception
+import kotlin.*
 
 /**
  * Пример
@@ -76,15 +76,12 @@ fun main() {
  * входными данными.
  */
 fun dateStrToDigit(str: String): String {
-    val day: Int
-    val month: String
-    val year: Int
-    val splitted = str.split(" ")
-    if (splitted.size != 3)
-        return ""
     try {
-        day = splitted[0].toInt()
-        month = when (splitted[1]) {
+        val splitted = str.split(" ")
+        if (splitted.size != 3)
+            return ""
+        val day = splitted[0].toInt()
+        val month = when (splitted[1]) {
             "января" -> "01"
             "февраля" -> "02"
             "марта" -> "03"
@@ -99,14 +96,14 @@ fun dateStrToDigit(str: String): String {
             "декабря" -> "12"
             else -> return ""
         }
-        year = splitted[2].toInt()
+        val year = splitted[2]
 
-        if (day > daysInMonth(month.toInt(), year))
+        if (day > daysInMonth(month.toInt(), year.toInt()))
             return ""
+        return "${twoDigitStr(day)}.$month.$year"
     } catch (e: NumberFormatException) {
         return ""
     }
-    return (if (day < 10) "0$day" else day.toString()) + ".$month" + "." + year.toString()
 }
 
 /**
@@ -120,15 +117,12 @@ fun dateStrToDigit(str: String): String {
  * входными данными.
  */
 fun dateDigitToStr(digital: String): String {
-    val day: Int
-    val month: String
-    val year: Int
-    val splitted = digital.split(".")
-    if (splitted.size != 3)
-        return ""
     try {
-        day = splitted[0].toInt()
-        month = when (splitted[1].toInt()) {
+        val splitted = digital.split(".")
+        if (splitted.size != 3)
+            return ""
+        val day = splitted[0].toInt()
+        val month = when (splitted[1].toInt()) {
             1 -> "января"
             2 -> "февраля"
             3 -> "марта"
@@ -143,7 +137,7 @@ fun dateDigitToStr(digital: String): String {
             12 -> "декабря"
             else -> return ""
         }
-        year = splitted[2].toInt()
+        val year = splitted[2].toInt()
         if (day > daysInMonth(splitted[1].toInt(), year))
             return ""
         return "$day $month $year"
@@ -167,32 +161,22 @@ fun dateDigitToStr(digital: String): String {
  * PS: Дополнительные примеры работы функции можно посмотреть в соответствующих тестах.
  */
 fun flattenPhoneNumber(phone: String): String {
-    val splitted = clean(phone.split(""))
-    if ("(" in splitted && ")" in splitted)
-        if (splitted.indexOf("(") != splitted.lastIndexOf("(") ||
-            splitted.indexOf(")") != splitted.lastIndexOf(")") ||
-            splitted.indexOf(")") - splitted.indexOf("(") <= 1 ||
-            splitted.indexOf(")") == splitted.size - 1
-        )
-            return ""
-    for (i in splitted.indices) {
-        val item = splitted[i]
-        if (i == 0 && !"+0123456789".contains(item))
-            return ""
-        if (i != 0 && !"0123456789()".contains(item))
-            return ""
-    }
-    splitted.remove("(")
-    splitted.remove(")")
-    return splitted.joinToString("")
-}
-
-fun clean(list: List<String>): MutableList<String> {
-    val result = mutableListOf<String>()
-    for (i in list)
-        if (i !in " -" && i.isNotEmpty())
-            result.add(i)
-    return result
+//    val input = phone.filter { it !in "- " }
+//    return if (Regex("""\d+\(\d+\)\d+""").matches(input) ||
+//        Regex("""\+\d+\(\d+\)\d+""").matches(input) ||
+//        Regex("""\d+""").matches(input) ||
+//        Regex("""\+\d+""").matches(input)
+//    )
+//        input.filter { it in "1234567890+" }
+//    else
+//        ""
+    val input = phone.filter { it !in "- " }
+    return if (Regex("""\+*\d+\(\d+\)\d+""").matches(input) ||
+        Regex("""\+*\d+""").matches(input)
+    )
+        input.filter { it in "1234567890+" }
+    else
+        ""
 }
 
 /**
@@ -314,24 +298,17 @@ fun isNumber(data: String): Boolean {
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
 fun plusMinus(expression: String): Int {
-    val data = expression.split(" ")
-    val numbers = mutableListOf<Int>()
-    var old = ""
-    for (i in data) {
-        if (isNumber(i))
-            when {
-                isNumber(old) -> throw IllegalArgumentException()
-                old == "+" || old.isEmpty() -> numbers.add(i.toInt())
-                else -> numbers.add(-1 * i.toInt())
-            }
-        else when (i) {
-            "+" -> require(!(old == "" || old == "+" || old == "-"))
-            "-" -> require(!(old == "+" || old == "-"))
-            else -> throw IllegalArgumentException()
-        }
-        old = i
-    }
-    return numbers.sum()
+    if (Regex("""\d+((\s[-+]\s\d+)+)*""").matches(expression) ||
+        Regex("""-\s\d+((\s[-+]\s\d+)+)*""").matches(expression)
+    ) {
+        var sign = "+"
+        var answer = 0
+        for (i in expression.split(" "))
+            if (isNumber(i))
+                answer += i.toInt() * if (sign == "+") 1 else -1
+            else sign = i
+        return answer
+    } else throw IllegalArgumentException()
 }
 
 /**
@@ -345,14 +322,12 @@ fun plusMinus(expression: String): Int {
  */
 fun firstDuplicateIndex(str: String): Int {
     val data = str.split(" ")
-    for (i in 1 until data.size)
+    var index = 0
+    for (i in 1 until data.size) {
+        index = str.indexOf(data[i - 1], startIndex = index)
         if (data[i - 1].toLowerCase() == data[i].toLowerCase())
-            return if (i == 1)
-                0
-            else if (i == data.size - 1)
-                str.indexOf(" " + data[i - 1] + " " + data[i]) + 1
-            else
-                str.indexOf(" " + data[i - 1] + " " + data[i] + " ") + 1
+            return index
+    }
     return -1
 }
 
@@ -369,7 +344,7 @@ fun firstDuplicateIndex(str: String): Int {
  */
 fun mostExpensive(description: String): String {
     val positions = description.split("; ")
-    var max = Pair<String, Double>("kok", -1.0)
+    var max = Pair<String, Double>("", -1.0)
     for (i in positions) {
         val data = i.split(" ")
         if (data.size != 2)
@@ -405,30 +380,11 @@ fun fromRoman(roman: String): Int {
         if (i !in "IVXLCDM")
             return -1
     }
-    if (str.contains("CM")) {
-        str = remove(str, "CM")
-        answer += 900
-    }
-    if (str.contains("CD")) {
-        str = remove(str, "CD")
-        answer += 400
-    }
-    if (str.contains("XC")) {
-        str = remove(str, "XC")
-        answer += 90
-    }
-    if (str.contains("XL")) {
-        str = remove(str, "XL")
-        answer += 40
-    }
-    if (str.contains("IX")) {
-        str = remove(str, "IX")
-        answer += 9
-    }
-    if (str.contains("IV")) {
-        str = remove(str, "IV")
-        answer += 4
-    }
+    for ((key, value) in listOf("CM" to 900, "CD" to 400, "XC" to 90, "XL" to 40, "IX" to 9, "IV" to 4))
+        if (str.contains(key)) {
+            str = remove(str, key)
+            answer += value
+        }
     for (i in str)
         when (i) {
             'I' -> answer += 1

@@ -2,7 +2,11 @@
 
 package lesson5.task1
 
+import kotlinx.html.I
 import lesson2.task2.daysInMonth
+import lesson4.task1.mean
+import lesson9.task2.canOpenLock
+import ru.spbstu.kotlin.typeclass.kind
 import javax.xml.crypto.dom.DOMCryptoContext
 import kotlin.math.*
 
@@ -96,17 +100,11 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
  *     -> mapOf(5 to listOf("Семён", "Михаил"), 3 to listOf("Марат"))
  */
 fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
-    val answer = mutableMapOf<Int, List<String>>()
-    val marks = mutableSetOf<Int>()
-    for (i in grades)
-        marks.add(i.value)
-    for (i in marks) {
-        val students = mutableListOf<String>()
-        for ((key, value) in grades)
-            if (value == i)
-                students.add(key)
-        if (students.isNotEmpty())
-            answer[i] = students
+    val answer = mutableMapOf<Int, MutableList<String>>()
+    for ((key, value) in grades) {
+        if (!answer.containsKey(value))
+            answer[value] = mutableListOf(key)
+        else answer[value]!!.add(key)
     }
     return answer
 }
@@ -155,13 +153,7 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
  * В выходном списке не должно быть повторяюихся элементов,
  * т. е. whoAreInBoth(listOf("Марат", "Семён, "Марат"), listOf("Марат", "Марат")) == listOf("Марат")
  */
-fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
-    val answer = mutableSetOf<String>()
-    for (value in a)
-        if (value in b)
-            answer.add(value)
-    return answer.toList()
-}
+fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = a.intersect(b).toList()
 
 /**
  * Средняя
@@ -214,15 +206,7 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
  *   averageStockPrice(listOf("MSFT" to 100.0, "MSFT" to 200.0, "NFLX" to 40.0))
  *     -> mapOf("MSFT" to 150.0, "NFLX" to 40.0)
  */
-fun average(list: List<Double>): Double {
-    var count = 0
-    var sum = 0.0
-    for (i in list) {
-        sum += i
-        count += 1
-    }
-    return sum / count
-}
+
 
 fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
     val temp = mutableMapOf<String, MutableList<Double>>()
@@ -234,7 +218,7 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
             temp[key]!!.add(value)
     }
     for ((key, _) in temp)
-        answer[key] = average(temp[key]!!.toList())
+        answer[key] = mean(temp[key]!!.toList())
     return answer
 }
 
@@ -296,12 +280,7 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  * Например:
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
-fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    for (i in word)
-        if (i.toLowerCase() !in chars && i.toUpperCase() !in chars)
-            return false
-    return true
-}
+fun canBuildFrom(chars: List<Char>, word: String): Boolean = chars.containsAll(word.toList())
 
 /**
  * Средняя
@@ -331,15 +310,8 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
     val answer = mutableMapOf<String, Int>()
     val toDelete = mutableListOf<String>()
     for (i in list)
-        if (answer.containsKey(i))
-            answer[i] = answer[i]?.plus(1)!!
-        else answer[i] = 1
-    for ((key, value) in answer)
-        if (value == 1)
-            toDelete.add(key)
-    for (i in toDelete)
-        answer.remove(i)
-    return answer
+        answer[i] = answer.getOrDefault(i, 0) + 1
+    return answer.filter { it.value > 1 }
 }
 
 /**
@@ -364,8 +336,7 @@ fun hasAnagrams(words: List<String>): Boolean {
     val wordsSorted = mutableListOf<String>()
     for (word in words)
         wordsSorted.add(word.toList().sorted().toString())
-    wordsSorted.sort()
-    return wordsSorted != wordsSorted.toSet().toList()
+    return wordsSorted.size != wordsSorted.toSet().size
 }
 
 /**
@@ -417,7 +388,6 @@ fun hasAnagrams(words: List<String>): Boolean {
  *        )
  */
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
-    val friendsUpdated = friends.toMutableMap()
     val answer = mutableMapOf<String, Set<String>>()
     val temp = mutableSetOf<String>()
     for ((_, value) in friends)
@@ -426,12 +396,17 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
                 temp.add(i)
     for (i in temp)
         answer[i] = setOf()
-    for ((key, _) in friendsUpdated)
-        answer[key] = getFriends(friendsUpdated, key, listOf(key)).reversed().toSet()
+    for ((key, _) in friends)
+        answer[key] = getFriends(friends, key, listOf(key), answer).reversed().toSet()
     return answer
 }
 
-fun getFriends(friends: Map<String, Set<String>>, key: String, stop: List<String>): Set<String> {
+fun getFriends(
+    friends: Map<String, Set<String>>,
+    key: String,
+    stop: List<String>,
+    answer: Map<String, Set<String>>
+): Set<String> {
     val temp = mutableSetOf<String>()
     val stopUpdated = stop.toMutableList()
     if (!friends[key].isNullOrEmpty())
@@ -439,7 +414,11 @@ fun getFriends(friends: Map<String, Set<String>>, key: String, stop: List<String
             if (i !in stopUpdated) {
                 stopUpdated.add(i)
                 temp.add(i)
-                temp.addAll(getFriends(friends, i, stopUpdated))
+                if (i in answer.keys) {
+                    if (!answer[i].isNullOrEmpty())
+                        temp.addAll(answer.getValue(i).filter { it !in stopUpdated })
+                } else
+                    temp.addAll(getFriends(friends, i, stopUpdated, answer))
             }
     return temp
 }
@@ -478,24 +457,20 @@ fun getFriends(friends: Map<String, Set<String>>, key: String, stop: List<String
  *   findSumOfTwo(listOf(1, 2, 3), 4) -> Pair(0, 2)
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
+
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    if (number % 2 == 0) {
-        val a = list.indexOf(number / 2)
-        var b = -1
-        for (i in a + 1 until list.size)
-            if (list[i] == number / 2)
-                b = i
-        if (a != b && b != -1)
-            return Pair(a, b)
-    }
-    val numbers = mutableMapOf<Int, Boolean>()
-    for (i in list)
-        numbers[i] = true
+    val numbers = mutableMapOf<Int, MutableList<Int>>()
+    for (i in list.indices)
+        if (!numbers.containsKey(list[i]))
+            numbers[list[i]] = mutableListOf(i)
+        else
+            numbers[list[i]]!!.add(i)
     for (i in 0 until ceil(number / 2.0).toInt())
-        if (numbers[i] == true && numbers[number - i] == true)
+        if (numbers[i] != null && numbers[number - i] != null)
             return Pair(list.indexOf(i), list.indexOf(number - i))
     return Pair(-1, -1)
 }
+
 
 /**
  * Очень сложная
@@ -539,4 +514,43 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *     450
  *   ) -> emptySet()
  */
-fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> = TODO()
+fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
+    val names = mutableListOf<String>()
+    val weights = mutableListOf<Int>()
+    val costs = mutableListOf<Int>()
+    val arr = mutableListOf<MutableList<Int>>()
+    val combinations = mutableListOf<MutableList<MutableList<String>>>()
+    for ((key, value) in treasures) {
+        names.add(key)
+        weights.add(value.first)
+        costs.add(value.second)
+    }
+    for (i in 0..names.size) {
+        arr.add(mutableListOf())
+        combinations.add(mutableListOf())
+        for (j in 0..capacity) {
+            arr[i].add(0)
+            combinations[i].add(mutableListOf())
+        }
+    }
+    for (i in 0 until names.size)
+        for (j in 0..capacity)
+            if (weights[i] > j) {
+                arr[i + 1][j] = arr[i][j]
+                combinations[i + 1][j] = combinations[i][j]
+            } else {
+                arr[i + 1][j] = max(arr[i][j], arr[i][j - weights[i]] + costs[i])
+                combinations[i + 1][j].add(names[i])
+            }
+    var a = 0
+    var b = 0
+    var maxCost = -1
+    for (i in arr.indices)
+        for (j in arr[i].indices)
+            if (arr[i][j] > maxCost) {
+                maxCost = arr[i][j]
+                a = i
+                b = j
+            }
+    return combinations[a][b].toSet()
+}
