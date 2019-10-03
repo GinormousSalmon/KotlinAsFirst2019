@@ -454,12 +454,28 @@ fun getFriends(
 
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     if (list.isNotEmpty()) {
+        val data = list.sorted()
         var lIndex = 0
-        var rIndex = list.size - 1
+        var rIndex = data.size - 1
         while (lIndex != rIndex)
             when {
-                list[lIndex] + list[rIndex] == number -> return Pair(lIndex, rIndex)
-                list[lIndex] + list[rIndex] < number -> lIndex++
+                data[lIndex] + data[rIndex] == number -> {
+                    var a = 0
+                    var b = 0
+                    if (data[lIndex] == data[rIndex]) {
+                        a = list.indexOf(data[lIndex])
+                        for (i in a + 1 until data.size)
+                            if (data[rIndex] == list[i]) {
+                                b = i
+                                break
+                            }
+                    } else {
+                        a = list.indexOf(data[rIndex])
+                        b = list.indexOf(data[lIndex])
+                    }
+                    return Pair(min(a, b), max(a, b))
+                }
+                data[lIndex] + data[rIndex] < number -> lIndex++
                 else -> rIndex--
             }
     }
