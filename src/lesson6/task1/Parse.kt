@@ -161,15 +161,6 @@ fun dateDigitToStr(digital: String): String {
  * PS: Дополнительные примеры работы функции можно посмотреть в соответствующих тестах.
  */
 fun flattenPhoneNumber(phone: String): String {
-//    val input = phone.filter { it !in "- " }
-//    return if (Regex("""\d+\(\d+\)\d+""").matches(input) ||
-//        Regex("""\+\d+\(\d+\)\d+""").matches(input) ||
-//        Regex("""\d+""").matches(input) ||
-//        Regex("""\+\d+""").matches(input)
-//    )
-//        input.filter { it in "1234567890+" }
-//    else
-//        ""
     val input = phone.filter { it !in "- " }
     return if (Regex("""\+*\d+\(\d+\)\d+""").matches(input) ||
         Regex("""\+*\d+""").matches(input)
@@ -403,7 +394,4 @@ fun remove(str: String, delete: String): String {
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */  // */<>+-[]
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
-    require(Regex("""(([<>\-+]+)*((\[[<>\-+]+])+)*)+""").matches(commands))
-    return listOf()
-}
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
