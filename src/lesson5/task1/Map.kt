@@ -2,12 +2,7 @@
 
 package lesson5.task1
 
-import kotlinx.html.I
-import lesson2.task2.daysInMonth
 import lesson4.task1.mean
-import lesson9.task2.canOpenLock
-import ru.spbstu.kotlin.typeclass.kind
-import javax.xml.crypto.dom.DOMCryptoContext
 import kotlin.math.*
 
 /**

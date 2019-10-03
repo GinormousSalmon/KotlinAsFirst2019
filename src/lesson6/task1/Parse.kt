@@ -218,60 +218,16 @@ fun bestLongJump(jumps: String): Int {
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
+
 fun bestHighJump(jumps: String): Int {
-    val overcome = mutableListOf<Int>()
-    val stack = Stack<String>()
-    val data = mutableListOf<String>()
-    for (i in jumps.split(" "))
-        try {
-            i.toInt()
-            data.add(i)
-        } catch (e: NumberFormatException) {
-            for (j in i.split(""))
-                if (j.isNotEmpty())
-                    if (j != "%" && j != "+" && j != "-")
-                        return -1
-                    else data.add(j)
-        }
-    for (i in data) {
-        if (stack.isEmpty())
-            if (isNumber(i)) {
-                stack.push(i)
-                continue
-            } else return -1
-        if (isNumber(i))
-            when (stack.peek()) {
-                "%" -> return -1
-                "-" -> stack.push(i)
-                "+" -> stack.push(i)
-                else -> return -1
-            }
-        if (i == "%" || i == "+")
-            when (stack.peek()) {
-                "%" -> stack.push(i)
-                "-" -> return -1
-                "+" -> return -1
-                else -> stack.push(i)
-            }
-        if (i == "-")
-            when (stack.peek()) {
-                "%" -> stack.push(i)
-                "-" -> return -1
-                "+" -> return -1
-                else -> return -1
-            }
-    }
-    var old = 0
-    for (i in data) {
-        if (isNumber(i))
-            old = i.toInt()
-        if (i == "+")
-            overcome.add(old)
-    }
-    return if (overcome.isEmpty())
-        -1
-    else
-        overcome.max()!!
+    return if (Regex("""\d+\s(\+|%+\+|%+-|%+)(\s\d+\s(\+|%+\+|%+-|%+))*""").matches(jumps)) {
+        var max = -1
+        val data = jumps.filter { it in "1234567890+- " }.split(" ")
+        for (i in data.indices)
+            if (data[i] == "+")
+                max = maxOf(max, data[i - 1].toInt())
+        max
+    } else -1
 }
 
 
@@ -323,10 +279,10 @@ fun plusMinus(expression: String): Int {
 fun firstDuplicateIndex(str: String): Int {
     val data = str.split(" ")
     var index = 0
-    for (i in 1 until data.size) {
-        index = str.indexOf(data[i - 1], startIndex = index)
-        if (data[i - 1].toLowerCase() == data[i].toLowerCase())
+    for (i in 0 until data.size - 1) {
+        if (data[i].toLowerCase() == data[i + 1].toLowerCase())
             return index
+        index += data[i].length + 1
     }
     return -1
 }
@@ -344,7 +300,7 @@ fun firstDuplicateIndex(str: String): Int {
  */
 fun mostExpensive(description: String): String {
     val positions = description.split("; ")
-    var max = Pair<String, Double>("", -1.0)
+    var max = Pair("", -1.0)
     for (i in positions) {
         val data = i.split(" ")
         if (data.size != 2)
