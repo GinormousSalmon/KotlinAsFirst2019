@@ -453,17 +453,15 @@ fun getFriends(
  */
 
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    val numbers = mutableMapOf<Int, MutableList<Int>>()
-    for (i in list.indices)
-        if (!numbers.containsKey(list[i]))
-            numbers[list[i]] = mutableListOf(i)
-        else
-            numbers[list[i]]!!.add(i)
-    for (i in 0 until ceil(number / 2.0).toInt() + if (number == 0) 1 else 0) {
-        if (numbers[i] != null && numbers[number - i] != null)
-            return if (i == number - i)
-                Pair(numbers[i]!![0], numbers[number - i]!![1])
-            else Pair(numbers[i]!![0], numbers[number - i]!![0])
+    if (list.isNotEmpty()) {
+        var lIndex = 0
+        var rIndex = list.size - 1
+        while (lIndex != rIndex)
+            when {
+                list[lIndex] + list[rIndex] == number -> return Pair(lIndex, rIndex)
+                list[lIndex] + list[rIndex] < number -> lIndex++
+                else -> rIndex--
+            }
     }
     return Pair(-1, -1)
 }
