@@ -5,7 +5,6 @@ package lesson6.task1
 import lesson2.task2.daysInMonth
 import java.lang.IllegalArgumentException
 import java.lang.NumberFormatException
-import java.util.*
 import kotlin.*
 
 /**
@@ -210,8 +209,8 @@ fun bestLongJump(jumps: String): Int {
  * вернуть -1.
  */
 
-fun bestHighJump(jumps: String): Int {
-    return if (Regex("""\d+\s(\+|%+\+|%+-|%+)(\s\d+\s(\+|%+\+|%+-|%+))*""").matches(jumps)) {
+fun bestHighJump(jumps: String): Int =
+    if (Regex("""\d+\s(\+|%+\+|%+-|%+)(\s\d+\s(\+|%+\+|%+-|%+))*""").matches(jumps)) {
         var max = -1
         val data = jumps.filter { it in "1234567890+- " }.split(" ")
         for (i in data.indices)
@@ -219,7 +218,6 @@ fun bestHighJump(jumps: String): Int {
                 max = maxOf(max, data[i - 1].toInt())
         max
     } else -1
-}
 
 
 fun isNumber(data: String): Boolean {
@@ -244,7 +242,7 @@ fun isNumber(data: String): Boolean {
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int {
+fun plusMinus(expression: String): Int =
     if (Regex("""\d+((\s[-+]\s\d+)+)*""").matches(expression) ||
         Regex("""-\s\d+((\s[-+]\s\d+)+)*""").matches(expression)
     ) {
@@ -254,9 +252,9 @@ fun plusMinus(expression: String): Int {
             if (isNumber(i))
                 answer += i.toInt() * if (sign == "+") 1 else -1
             else sign = i
-        return answer
+        answer
     } else throw IllegalArgumentException()
-}
+
 
 /**
  * Сложная

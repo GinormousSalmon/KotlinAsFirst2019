@@ -461,7 +461,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
         while (lIndex != rIndex)
             when {
                 data[lIndex] + data[rIndex] == number -> {
-                    var a = 0
+                    val a: Int
                     var b = 0
                     if (data[lIndex] == data[rIndex]) {
                         a = list.indexOf(data[lIndex])
@@ -526,6 +526,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *     450
  *   ) -> emptySet()
  */
+
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
     val names = mutableListOf<String>()
     val weights = mutableListOf<Int>()
@@ -546,23 +547,31 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         }
     }
     for (i in 0 until names.size)
-        for (j in 0..capacity)
-            if (weights[i] > j) {
-                arr[i + 1][j] = arr[i][j]
-                combinations[i + 1][j] = combinations[i][j]
-            } else {
-                arr[i + 1][j] = max(arr[i][j], arr[i][j - weights[i]] + costs[i])
-                combinations[i + 1][j].add(names[i])
+        for (j in 0..capacity) {
+            when {
+                weights[i] > j -> {
+                    arr[i + 1][j] = arr[i][j]
+                    combinations[i + 1][j] = combinations[i][j].toMutableList()
+                }
+                arr[i][j] > arr[i][j - weights[i]] + costs[i] -> {
+                    arr[i + 1][j] = arr[i][j]
+                    combinations[i + 1][j] = combinations[i][j].toMutableList()
+                }
+                else -> {
+                    arr[i + 1][j] = arr[i][j - weights[i]] + costs[i]
+                    combinations[i + 1][j] = combinations[i][j - weights[i]].toMutableList()
+                    combinations[i + 1][j].add(names[i])
+                }
             }
+        }
     var a = 0
-    var b = 0
     var maxCost = -1
-    for (i in arr.indices)
-        for (j in arr[i].indices)
-            if (arr[i][j] > maxCost) {
-                maxCost = arr[i][j]
-                a = i
-                b = j
-            }
-    return combinations[a][b].toSet()
+    for (i in arr.indices) {
+        val elem = arr[i][capacity]
+        if (elem > maxCost) {
+            maxCost = elem
+            a = i
+        }
+    }
+    return combinations[a][combinations[a].size - 1].toSet()
 }
