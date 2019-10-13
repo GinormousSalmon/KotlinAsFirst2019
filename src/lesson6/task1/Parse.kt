@@ -398,9 +398,8 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     var x = cells / 2
     var count = 0
     require(commands == commands.filter { it in " <>-+[]" })
-    val commandsFiltered = commands.filter { it in "<>-+[]" }
     val stack = ArrayDeque<Char>()
-    for (i in commandsFiltered.filter { it in "[]" })
+    for (i in commands.filter { it in "[]" })
         when {
             i == '[' -> stack.push(i)
             stack.peek() == '[' -> stack.pop()
@@ -409,19 +408,18 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     require(stack.isEmpty())
     fun loop(startIndex: Int): Int {
         var index = startIndex
-        while (count < limit && index < commandsFiltered.length) {
+        while (count < limit && index < commands.length) {
             count += 1
-            when (commandsFiltered[index]) {
+            when (commands[index]) {
                 '+' -> data[x] += 1
                 '-' -> data[x] -= 1
                 '>' -> x += 1
                 '<' -> x -= 1
                 '[' -> index = if (data[x] == 0)
-                    nextBracket(commandsFiltered, index + 1)
+                    nextBracket(commands, index + 1)
                 else loop(index + 1) - 1
                 ']' -> if (data[x] != 0) {
                     index = startIndex - 1
-                    count += 1
                 } else if (startIndex != 0) return index + 1
             }
             check(x in 0 until cells)

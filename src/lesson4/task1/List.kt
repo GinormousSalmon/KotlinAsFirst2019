@@ -330,7 +330,7 @@ fun decimalFromString(str: String, base: Int): Int {
  */
 fun roman(n: Int): String {
     var answer = ""
-    var item = n / 1000  //старший разряд
+    var item = n / 1000
     for (i in 0 until item)
         answer += 'M'
     item = (n / 100) % 10
