@@ -5,6 +5,7 @@ package lesson6.task1
 import lesson2.task2.daysInMonth
 import java.lang.IllegalArgumentException
 import java.lang.NumberFormatException
+import java.util.*
 import kotlin.*
 
 /**
@@ -391,5 +392,60 @@ fun remove(str: String, delete: String): String {
  * IllegalArgumentException.
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
- */  // */<>+-[]
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+ */
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    val data = MutableList(cells) { 0 }
+    var x = cells / 2
+    var count = 0
+    require(commands == commands.filter { it in " <>-+[]" })
+    val commandsFiltered = commands.filter { it in "<>-+[]" }
+    val stack = ArrayDeque<Char>()
+    for (i in commandsFiltered.filter { it in "[]" })
+        when {
+            i == '[' -> stack.push(i)
+            stack.peek() == '[' -> stack.pop()
+            else -> throw IllegalArgumentException()
+        }
+    require(stack.isEmpty())
+    fun loop(startIndex: Int): Int {
+        var index = startIndex
+        while (count < limit && index < commandsFiltered.length) {
+            count += 1
+            when (commandsFiltered[index]) {
+                '+' -> data[x] += 1
+                '-' -> data[x] -= 1
+                '>' -> x += 1
+                '<' -> x -= 1
+                '[' -> index = if (data[x] == 0)
+                    nextBracket(commandsFiltered, index + 1)
+                else loop(index + 1) - 1
+                ']' -> if (data[x] != 0) {
+                    index = startIndex - 1
+                    count += 1
+                } else if (startIndex != 0) return index + 1
+            }
+            check(x in 0 until cells)
+            index += 1
+        }
+        return index
+    }
+    loop(0)
+    return data
+}
+
+fun nextBracket(commandsFiltered: String, startIndex: Int): Int {
+    val stack = ArrayDeque<Char>()
+    stack.push('[')
+    var index = -1
+    for (i in startIndex until commandsFiltered.length) {
+        when (commandsFiltered[i]) {
+            '[' -> stack.push('[')
+            ']' -> stack.pop()
+        }
+        if (stack.isEmpty()) {
+            index = i
+            break
+        }
+    }
+    return index
+}
