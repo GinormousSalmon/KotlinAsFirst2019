@@ -134,9 +134,7 @@ fun centerFile(inputName: String, outputName: String) {
 }
 
 fun spaces(n: Int) = List(n) { " " }.joinToString(separator = "")
-fun main() {
-    centerFile("test.txt", "kok")
-}
+
 /**
  * Сложная
  *
@@ -261,7 +259,25 @@ fun top20Words(inputName: String): Map<String, Int> {
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
-    TODO()
+    val dictionaryFixed = dictionary.map { Pair(it.key.toLowerCase(), it.value.toLowerCase()) }.toMap()
+    val outputStream = File(outputName).bufferedWriter()
+    val data = File(inputName).readLines().toMutableList()
+    for (string in data) {
+        var temp = ""
+        for (char in string) {
+            val chrLow = char.toLowerCase()
+            if (dictionaryFixed.containsKey(chrLow)) {
+                if (dictionaryFixed.getValue(chrLow).isNotEmpty())
+                    temp += if (char.isUpperCase())
+                        dictionaryFixed.getValue(chrLow)[0].toUpperCase() + dictionaryFixed.getValue(chrLow).substring(1)
+                    else
+                        dictionaryFixed.getValue(chrLow).toLowerCase()
+            } else temp += char
+        }
+        outputStream.write(temp)
+        outputStream.newLine()
+    }
+    outputStream.close()
 }
 
 /**
