@@ -55,9 +55,10 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  */
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
     val answer = mutableMapOf<String, Int>()
-    substrings.forEach { answer[it] = 0 }
+    val substringsFixed = substrings.toSet()
+    substringsFixed.forEach { answer[it] = 0 }
     for (str in File(inputName).readLines())
-        for (word in substrings)
+        for (word in substringsFixed)
             if (Regex(word, RegexOption.IGNORE_CASE).containsMatchIn(str))
                 answer[word] = answer.getOrDefault(word, 0) + entries(word, str)
     return answer
@@ -124,14 +125,18 @@ fun sibilants(inputName: String, outputName: String) {
 fun centerFile(inputName: String, outputName: String) {
     val outputStream = File(outputName).bufferedWriter()
     val data = File(inputName).readLines().map { it.trim() }
-    val maxLen = data.maxBy { it.length }!!.length
-    for (i in data)
-        outputStream.write(spaces(((maxLen - i.length) / 2.0).toInt()) + i + "\n")
+    if (data.isNotEmpty()) {
+        val maxLen = data.maxBy { it.length }!!.length
+        for (i in data)
+            outputStream.write(spaces(((maxLen - i.length) / 2.0).toInt()) + i + "\n")
+    }
     outputStream.close()
 }
 
 fun spaces(n: Int) = List(n) { " " }.joinToString(separator = "")
-
+fun main() {
+    centerFile("test.txt", "kok")
+}
 /**
  * Сложная
  *
@@ -162,23 +167,24 @@ fun spaces(n: Int) = List(n) { " " }.joinToString(separator = "")
 fun alignFileByWidth(inputName: String, outputName: String) {
     val outputStream = File(outputName).bufferedWriter()
     val data = File(inputName).readLines().map { it.trim() }
-    val targetLen = Regex("""\s+""").replace(data.maxBy { it -> it.filter { it != ' ' }.length }!!, " ").length
-    for (string in data) {
-        if (string.isEmpty() || " " !in string) {
-            outputStream.write(string + "\n")
-            continue
+    if (data.isNotEmpty()) {
+        val targetLen = Regex("""\s+""").replace(data.maxBy { it -> it.filter { it != ' ' }.length }!!, " ").length
+        for (string in data) {
+            if (string.isEmpty() || " " !in string) {
+                outputStream.write(string + "\n")
+                continue
+            }
+            val delta = targetLen - string.filter { it != ' ' }.length
+            val words = Regex("""\s+""").split(string)
+            val numberOfIntervals = words.size - 1
+            for (i in 0 until numberOfIntervals)
+                outputStream.write(words[i] + spaces(delta / numberOfIntervals + (delta % numberOfIntervals > i).toInt()))
+            outputStream.write(words.last())
+            outputStream.newLine()
         }
-        val delta = targetLen - string.filter { it != ' ' }.length
-        val words = Regex("""\s+""").split(string)
-        val numberOfIntervals = words.size - 1
-        for (i in 0 until numberOfIntervals)
-            outputStream.write(words[i] + spaces(delta / numberOfIntervals + (delta % numberOfIntervals > i).toInt()))
-        outputStream.write(words.last())
-        outputStream.newLine()
     }
     outputStream.close()
 }
-
 
 /**
  * Средняя
@@ -198,7 +204,26 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  * Ключи в ассоциативном массиве должны быть в нижнем регистре.
  *
  */
-fun top20Words(inputName: String): Map<String, Int> = TODO()
+fun top20Words(inputName: String): Map<String, Int> {
+    val data = mutableListOf<String>()
+    File(inputName).readLines().forEach { i ->
+        Regex("""[^A-Za-zА-Яа-яёЁ]+""").split(i).forEach { if (it.isNotEmpty()) data.add(it.toLowerCase()) }
+    }
+    val topWords = mutableMapOf<String, Int>()
+    for (i in data)
+        topWords[i] = topWords.getOrDefault(i, 0) + 1
+    val top20 = mutableMapOf<String, Int>()
+    val topSorted = topWords.toList().groupBy { it.second }.toList().sortedBy { it.first }.reversed()
+    var count = 0
+    for ((_, value) in topSorted) {
+        count += value.size
+        if (count <= 20)
+            top20.putAll(value)
+        else
+            break
+    }
+    return top20
+}
 
 /**
  * Средняя
