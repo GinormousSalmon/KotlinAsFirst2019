@@ -4,8 +4,6 @@ package lesson4.task1
 
 import lesson1.task1.discriminant
 import lesson3.task1.minDivisor
-import lesson5.task1.removeFillerWords
-import ru.spbstu.kotlin.generate.assume.retry
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -422,7 +420,7 @@ fun russian(n: Int): String {
             else -> ""
         }
         answer += when ((n % 10000) / 1000) {    //тысячи
-            1 -> if(answer.isNotEmpty()) "одна тысяча" else "тысяча"
+            1 -> if (answer.isEmpty()) "одна тысяча" else "тысяча"
             2 -> "две тысячи"
             3 -> "три тысячи"
             4 -> "четыре тысячи"
