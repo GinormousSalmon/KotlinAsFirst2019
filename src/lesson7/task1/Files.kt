@@ -184,6 +184,7 @@ fun alignFileByWidth(inputName: String, outputName: String) {
     outputStream.close()
 }
 
+
 /**
  * Средняя
  *
