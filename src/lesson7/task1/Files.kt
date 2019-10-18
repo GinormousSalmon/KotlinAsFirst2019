@@ -129,6 +129,8 @@ fun centerFile(inputName: String, outputName: String) {
         val maxLen = data.maxBy { it.length }!!.length
         for (i in data)
             outputStream.write(spaces(((maxLen - i.length) / 2.0).toInt()) + i + "\n")
+    } else{
+        outputStream.write("")
     }
     outputStream.close()
 }
