@@ -59,15 +59,16 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     substringsFixed.forEach { answer[it] = 0 }
     for (str in File(inputName).readLines())
         for (word in substringsFixed)
-            if (Regex(word, RegexOption.IGNORE_CASE).containsMatchIn(str))
+            if (str.toLowerCase().contains(word.toLowerCase()))
                 answer[word] = answer.getOrDefault(word, 0) + entries(word, str)
     return answer
 }
 
 fun entries(word: String, string: String): Int {
     var count = 0
+    val pattern = """\$word.*""".toRegex(RegexOption.IGNORE_CASE)
     for (i in 0..string.length - word.length)
-        count += Regex("""\$word.*""", RegexOption.IGNORE_CASE).matches(string.substring(i)).toInt()
+        count += pattern.matches(string.substring(i)).toInt()
     return count
 }
 
@@ -89,16 +90,14 @@ fun Boolean.toInt() = if (this) 1 else 0
 
 fun sibilants(inputName: String, outputName: String) {
     val outputStream = File(outputName).bufferedWriter()
-    val replacements = mapOf("Ы" to "И", "Ю" to "У", "Я" to "А", "ы" to "и", "ю" to "у", "я" to "а")
-    val consonants = listOf("Ж", "Ч", "Ш", "Щ", "ж", "ч", "ш", "щ")
-    val vowels = listOf("Ы", "Ю", "Я", "ы", "ю", "я")
+    val replacements = mapOf('Ы' to 'И', 'Ю' to 'У', 'Я' to 'А', 'ы' to 'и', 'ю' to 'у', 'я' to 'а')
+    val vowels = listOf('Ы', 'Ю', 'Я', 'ы', 'ю', 'я')
     for (strIn in File(inputName).readLines()) {
-        val strOut = strIn.split("").toMutableList()
-        for (i in consonants)
-            for (j in vowels)
-                Regex(i + j).findAll(strIn).forEach {
-                    strOut[it.range.last + 1] = replacements.getOrDefault(j, "")
-                }
+        val strOut = strIn.toMutableList()
+        for (j in vowels)
+            Regex("""[ЖЧШЩжчшщ]$j""").findAll(strIn).forEach {
+                strOut[it.range.last] = replacements.getValue(j)
+            }
         outputStream.write(strOut.joinToString(separator = ""))
         outputStream.newLine()
     }
@@ -129,13 +128,13 @@ fun centerFile(inputName: String, outputName: String) {
         val maxLen = data.maxBy { it.length }!!.length
         for (i in data)
             outputStream.write(spaces(((maxLen - i.length) / 2.0).toInt()) + i + "\n")
-    } else{
+    } else {
         outputStream.write("")
     }
     outputStream.close()
 }
 
-fun spaces(n: Int) = List(n) { " " }.joinToString(separator = "")
+fun spaces(n: Int) = " ".repeat(n)
 
 /**
  * Сложная
@@ -206,24 +205,24 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  *
  */
 fun top20Words(inputName: String): Map<String, Int> {
+    var count = 0
+    fun inc(n: Int): Boolean {
+        count += n
+        return count <= 20
+    }
+
     val data = mutableListOf<String>()
     File(inputName).readLines().forEach { i ->
-        Regex("""[^A-Za-zА-Яа-яёЁ]+""").split(i).forEach { if (it.isNotEmpty()) data.add(it.toLowerCase()) }
+        Regex("""[A-Za-zА-Яа-яёЁ]+""").findAll(i).forEach { data.add(it.value.toLowerCase()) }
     }
     val topWords = mutableMapOf<String, Int>()
     for (i in data)
         topWords[i] = topWords.getOrDefault(i, 0) + 1
-    val top20 = mutableMapOf<String, Int>()
     val topSorted = topWords.toList().groupBy { it.second }.toList().sortedBy { it.first }.reversed()
-    var count = 0
-    for ((_, value) in topSorted) {
-        count += value.size
-        if (count <= 20)
-            top20.putAll(value)
-        else
-            break
-    }
-    return top20
+        .takeWhile { inc(it.second.size) }
+    val top20 = mutableListOf<Pair<String, Int>>()
+    topSorted.map { it.second }.forEach { top20.addAll(it) }
+    return top20.toMap()
 }
 
 /**
@@ -269,11 +268,14 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
         val chrLow = char.toLowerCase()
         if (dictionaryFixed.containsKey(chrLow)) {
             if (dictionaryFixed.getValue(chrLow).isNotEmpty())
-                temp += if (char.isUpperCase())
-                    dictionaryFixed.getValue(chrLow)[0].toUpperCase() + dictionaryFixed.getValue(chrLow).substring(1)
-                else
-                    dictionaryFixed.getValue(chrLow).toLowerCase()
-        } else temp += char
+                temp +=
+                    if (char.isUpperCase())
+                        dictionaryFixed.getValue(chrLow).capitalize()
+                    else
+                        dictionaryFixed.getValue(chrLow)
+        } else {
+            temp += char
+        }
     }
     outputStream.write(temp)
     outputStream.close()

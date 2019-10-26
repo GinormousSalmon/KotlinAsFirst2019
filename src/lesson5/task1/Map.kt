@@ -252,9 +252,7 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
     for ((key, value) in stuff)
         if (value.first == kind)
             temp[key] = value
-    return if (temp.isNotEmpty())
-        temp.minBy { (_, value) -> value.second }!!.key
-    else null
+    return temp.minBy { (_, value) -> value.second }?.key
 }
 
 /**
