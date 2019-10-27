@@ -57,9 +57,10 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     val answer = mutableMapOf<String, Int>()
     val substringsFixed = substrings.toSet()
     substringsFixed.forEach { answer[it] = 0 }
-    for (str in File(inputName).readLines())
+    val data = File(inputName).readLines().map { it.toLowerCase() }
+    for (str in data)
         for (word in substringsFixed)
-            if (str.toLowerCase().contains(word.toLowerCase()))
+            if (str.contains(word.toLowerCase()))
                 answer[word] = answer.getOrDefault(word, 0) + entries(word, str)
     return answer
 }
