@@ -61,15 +61,14 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     for (str in data)
         for (word in substringsFixed)
             if (str.contains(word.toLowerCase()))
-                answer[word] = answer.getOrDefault(word, 0) + entries(word, str)
+                answer[word] = answer[word]!! + entries(word.toLowerCase(), str)
     return answer
 }
 
 fun entries(word: String, string: String): Int {
     var count = 0
-    val pattern = """\$word.*""".toRegex(RegexOption.IGNORE_CASE)
     for (i in 0..string.length - word.length)
-        count += pattern.matches(string.substring(i)).toInt()
+        count += string.substring(i).startsWith(word).toInt()
     return count
 }
 
@@ -91,13 +90,17 @@ fun Boolean.toInt() = if (this) 1 else 0
 
 fun sibilants(inputName: String, outputName: String) {
     val outputStream = File(outputName).bufferedWriter()
+    val consonants = "[ЖЧШЩжчшщ]"
     val replacements = mapOf('Ы' to 'И', 'Ю' to 'У', 'Я' to 'А', 'ы' to 'и', 'ю' to 'у', 'я' to 'а')
-    val vowels = listOf('Ы', 'Ю', 'Я', 'ы', 'ю', 'я')
+    val vowelsStr = "ЫЮЯыюя"
+    val vowels = mutableListOf<Pair<Char, Regex>>()
+    for (i in vowelsStr)
+        vowels.add(Pair(i, (consonants + i.toString()).toRegex()))
     for (strIn in File(inputName).readLines()) {
         val strOut = strIn.toMutableList()
-        for (j in vowels)
-            Regex("""[ЖЧШЩжчшщ]$j""").findAll(strIn).forEach {
-                strOut[it.range.last] = replacements.getValue(j)
+        for ((char, pattern) in vowels)
+            pattern.findAll(strIn).forEach {
+                strOut[it.range.last] = replacements.getValue(char)
             }
         outputStream.write(strOut.joinToString(separator = ""))
         outputStream.newLine()

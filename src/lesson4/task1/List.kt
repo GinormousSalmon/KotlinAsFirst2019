@@ -419,21 +419,22 @@ fun units(n: Int): String = when (n) {
     else -> ""
 }
 
+fun getDigit(number: Int, n: Int): Int = number % pow(10, n) / pow(10, n - 1)
 
 fun russian(n: Int): String {
-    var answer = hundreds(n / 100000)
+    var answer = hundreds(getDigit(n, 6))
     answer +=
-        if ((n % 100000) / 1000 in 11..19)
-            elevenToNineteen((n % 100000) / 1000) + "тысяч "
+        if (getDigit(n, 5) * 10 + getDigit(n, 4) in 11..19)
+            elevenToNineteen(getDigit(n, 5) * 10 + getDigit(n, 4)) + "тысяч "
         else
-            tens((n % 100000) / 10000) + unitsWithThousands((n % 10000) / 1000)
+            tens(getDigit(n, 5)) + unitsWithThousands(getDigit(n, 4))
     if (answer.isNotEmpty() && !answer.contains("тысяч"))
         answer += "тысяч "
-    answer += hundreds((n % 1000) / 100)
+    answer += hundreds(getDigit(n, 3))
     answer +=
-        if (n % 100 in 11..19)
-            elevenToNineteen(n % 100)
+        if (getDigit(n, 2) * 10 + getDigit(n, 1) in 11..19)
+            elevenToNineteen(getDigit(n, 2) * 10 + getDigit(n, 1))
         else
-            tens((n % 100) / 10) + units(n % 10)
+            tens(getDigit(n, 2)) + units(getDigit(n, 1))
     return answer.trim()
 }
