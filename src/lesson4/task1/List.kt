@@ -3,7 +3,6 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
-import lesson7.task1.toInt
 import kotlin.math.sqrt
 
 /**
@@ -417,6 +416,7 @@ fun russian(n: Int): String {
         else digitsFormatted.add(digits[index])
         index += 1
     }
+    println(digitsFormatted)
     var answer = ""
     for ((i, value) in digitsFormatted.withIndex()) {
         answer += when (value) {
@@ -424,7 +424,7 @@ fun russian(n: Int): String {
             2 -> if (i == digitsFormatted.size - 1) "два " else "две "
             else -> data[value]
         }
-        if (digitsFormatted.size - i == 4)
+        if (digits.size - i == 4)
             answer += when (value) {
                 1 -> "тысяча "
                 in 2..4 -> "тысячи "
@@ -434,3 +434,6 @@ fun russian(n: Int): String {
     return answer.trim()
 }
 
+fun main() {
+    println(russian(224411))
+}
