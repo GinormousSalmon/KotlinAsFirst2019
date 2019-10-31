@@ -316,7 +316,7 @@ fun chooseLongestChaoticWord(inputName: String, outputName: String) {
     data.forEach { if (it.length == it.toLowerCase().toSet().size) dataFiltered.add(it) }
     dataFiltered.sortBy { it.length }
     val dataGroup = dataFiltered.groupBy { it.length }
-    output.write(dataGroup[dataGroup.keys.max()]!!.joinToString(separator = ", "))
+    output.write(dataGroup.getOrDefault(dataGroup.keys.max()!!, listOf("")).joinToString(separator = ", "))
     output.close()
 }
 

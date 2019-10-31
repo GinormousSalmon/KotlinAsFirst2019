@@ -406,34 +406,32 @@ fun russian(n: Int): String {
     val digitsFormatted = mutableListOf<Int>()
     var index = 0
     while (index < digits.size) {
+        if (digits.size - index == 3 && index != 0)
+            digitsFormatted.add(1000)
         if (digits[index] == 1 && (digits.size - index - 1) % 3 == 1) {
             digitsFormatted.add(digits[index] * 10 + digits[index + 1])
             index += 1
-        } else if (digits[index] in 2..9 && (digits.size - index - 1) % 3 == 1)
-            digitsFormatted.add(digits[index] * 10)
-        else if (digits[index] in 1..9 && (digits.size - index - 1) % 3 == 2)
-            digitsFormatted.add(digits[index] * 100)
-        else digitsFormatted.add(digits[index])
+        } else {
+            if (digits[index] in 2..9 && (digits.size - index - 1) % 3 == 1)
+                digitsFormatted.add(digits[index] * 10)
+            else if (digits[index] in 1..9 && (digits.size - index - 1) % 3 == 2)
+                digitsFormatted.add(digits[index] * 100)
+            else digitsFormatted.add(digits[index])
+        }
         index += 1
     }
-    println(digitsFormatted)
     var answer = ""
     for ((i, value) in digitsFormatted.withIndex()) {
         answer += when (value) {
             1 -> if (i == digitsFormatted.size - 1) "один " else "одна "
             2 -> if (i == digitsFormatted.size - 1) "два " else "две "
-            else -> data[value]
-        }
-        if (digits.size - i == 4)
-            answer += when (value) {
+            1000 -> when (digitsFormatted[i - 1]) {
                 1 -> "тысяча "
                 in 2..4 -> "тысячи "
                 else -> "тысяч "
             }
+            else -> data[value]
+        }
     }
     return answer.trim()
-}
-
-fun main() {
-    println(russian(224411))
 }
