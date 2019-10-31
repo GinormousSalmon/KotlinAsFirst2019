@@ -3,8 +3,7 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
-import lesson3.task1.minDivisor
-import kotlin.math.pow
+import lesson7.task1.toInt
 import kotlin.math.sqrt
 
 /**
@@ -165,9 +164,6 @@ fun times(a: List<Int>, b: List<Int>): Int {
     return composition
 }
 
-
-fun pow(a: Int, n: Int): Int = a.toDouble().pow(n).toInt()
-
 /**
  * Средняя
  *
@@ -209,13 +205,20 @@ fun accumulate(list: MutableList<Int>): MutableList<Int> {
  * Результат разложения вернуть в виде списка множителей, например 75 -> (3, 5, 5).
  * Множители в списке должны располагаться по возрастанию.
  */
+
+fun minDivisorOptimized(n: Int, start: Int): Int {
+    var del = start
+    while (n % del != 0)
+        del += 1
+    return del
+}
+
 fun factorize(n: Int): List<Int> {
     var num = n
     val list = mutableListOf<Int>()
     var div = 2
     do {
-        if (num % div != 0)
-            div = minDivisor(num)
+        div = minDivisorOptimized(num, div)
         list.add(div)
         num /= div
     } while (num != 1)
@@ -352,89 +355,82 @@ fun roman(n: Int): String {
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
 
-fun hundreds(n: Int): String = when (n) {
-    1 -> "сто "
-    2 -> "двести "
-    3 -> "триста "
-    4 -> "четыреста "
-    5 -> "пятьсот "
-    6 -> "шестьсот "
-    7 -> "семьсот "
-    8 -> "восемьсот "
-    9 -> "девятьсот "
-    else -> ""
+fun getDigits(n: Int): List<Int> {
+    val result = mutableListOf<Int>()
+    var number = n
+    while (number > 0) {
+        result.add(number % 10)
+        number /= 10
+    }
+    return result
 }
-
-
-fun elevenToNineteen(n: Int): String = when (n) {
-    11 -> "одиннадцать "
-    12 -> "двенадцать "
-    13 -> "тринадцать "
-    14 -> "четырнадцать "
-    15 -> "пятнадцать "
-    16 -> "шестнадцать "
-    17 -> "семнадцать "
-    18 -> "восемнадцать "
-    19 -> "девятнадцать "
-    else -> ""
-}
-
-fun tens(n: Int): String = when (n) {
-    1 -> "десять "
-    2 -> "двадцать "
-    3 -> "тридцать "
-    4 -> "сорок "
-    5 -> "пятьдесят "
-    6 -> "шестьдесят "
-    7 -> "семьдесят "
-    8 -> "восемьдесят "
-    9 -> "девяносто "
-    else -> ""
-}
-
-fun unitsWithThousands(n: Int): String = when (n) {
-    1 -> "одна тысяча "
-    2 -> "две тысячи "
-    3 -> "три тысячи "
-    4 -> "четыре тысячи "
-    5 -> "пять тысяч "
-    6 -> "шесть тысяч "
-    7 -> "семь тысяч "
-    8 -> "восемь тысяч "
-    9 -> "девять тысяч "
-    else -> ""
-}
-
-
-fun units(n: Int): String = when (n) {
-    1 -> "один"
-    2 -> "два"
-    3 -> "три"
-    4 -> "четыре"
-    5 -> "пять"
-    6 -> "шесть"
-    7 -> "семь"
-    8 -> "восемь"
-    9 -> "девять"
-    else -> ""
-}
-
-fun getDigit(number: Int, n: Int): Int = number % pow(10, n) / pow(10, n - 1)
 
 fun russian(n: Int): String {
-    var answer = hundreds(getDigit(n, 6))
-    answer +=
-        if (getDigit(n, 5) * 10 + getDigit(n, 4) in 11..19)
-            elevenToNineteen(getDigit(n, 5) * 10 + getDigit(n, 4)) + "тысяч "
-        else
-            tens(getDigit(n, 5)) + unitsWithThousands(getDigit(n, 4))
-    if (answer.isNotEmpty() && !answer.contains("тысяч"))
-        answer += "тысяч "
-    answer += hundreds(getDigit(n, 3))
-    answer +=
-        if (getDigit(n, 2) * 10 + getDigit(n, 1) in 11..19)
-            elevenToNineteen(getDigit(n, 2) * 10 + getDigit(n, 1))
-        else
-            tens(getDigit(n, 2)) + units(getDigit(n, 1))
+    val data = mapOf(
+        3 to "три ",
+        4 to "четыре ",
+        5 to "пять ",
+        6 to "шесть ",
+        7 to "семь ",
+        8 to "восемь ",
+        9 to "девять ",
+        10 to "десять ",
+        11 to "одиннадцать ",
+        12 to "двенадцать ",
+        13 to "тринадцать ",
+        14 to "четырнадцать ",
+        15 to "пятнадцать ",
+        16 to "шестнадцать ",
+        17 to "семнадцать ",
+        18 to "восемнадцать ",
+        19 to "девятнадцать ",
+        20 to "двадцать ",
+        30 to "тридцать ",
+        40 to "сорок ",
+        50 to "пятьдесят ",
+        60 to "шестьдесят ",
+        70 to "семьдесят ",
+        80 to "восемьдесят ",
+        90 to "девяносто ",
+        100 to "сто ",
+        200 to "двести ",
+        300 to "триста ",
+        400 to "четыреста ",
+        500 to "пятьсот ",
+        600 to "шестьсот ",
+        700 to "семьсот ",
+        800 to "восемьсот ",
+        900 to "девятьсот ",
+        0 to ""
+    )
+    val digits = getDigits(n).reversed()
+    val digitsFormatted = mutableListOf<Int>()
+    var index = 0
+    while (index < digits.size) {
+        if (digits[index] == 1 && (digits.size - index - 1) % 3 == 1) {
+            digitsFormatted.add(digits[index] * 10 + digits[index + 1])
+            index += 1
+        } else if (digits[index] in 2..9 && (digits.size - index - 1) % 3 == 1)
+            digitsFormatted.add(digits[index] * 10)
+        else if (digits[index] in 1..9 && (digits.size - index - 1) % 3 == 2)
+            digitsFormatted.add(digits[index] * 100)
+        else digitsFormatted.add(digits[index])
+        index += 1
+    }
+    var answer = ""
+    for ((i, value) in digitsFormatted.withIndex()) {
+        answer += when (value) {
+            1 -> if (i == digitsFormatted.size - 1) "один " else "одна "
+            2 -> if (i == digitsFormatted.size - 1) "два " else "две "
+            else -> data[value]
+        }
+        if (digitsFormatted.size - i == 4)
+            answer += when (value) {
+                1 -> "тысяча "
+                in 2..4 -> "тысячи "
+                else -> "тысяч "
+            }
+    }
     return answer.trim()
 }
+
