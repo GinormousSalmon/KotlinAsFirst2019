@@ -3,6 +3,9 @@
 package lesson7.task1
 
 import java.io.File
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.pow
 
 /**
  * Пример
@@ -139,6 +142,7 @@ fun centerFile(inputName: String, outputName: String) {
 }
 
 fun spaces(n: Int) = " ".repeat(n)
+
 
 /**
  * Сложная
@@ -316,7 +320,8 @@ fun chooseLongestChaoticWord(inputName: String, outputName: String) {
     data.forEach { if (it.length == it.toLowerCase().toSet().size) dataFiltered.add(it) }
     dataFiltered.sortBy { it.length }
     val dataGroup = dataFiltered.groupBy { it.length }
-    output.write(dataGroup.getOrDefault(dataGroup.keys.max()!!, listOf("")).joinToString(separator = ", "))
+    if (dataGroup.isNotEmpty())
+        output.write(dataGroup[dataGroup.keys.max()]!!.joinToString(separator = ", "))
     output.close()
 }
 
@@ -510,7 +515,23 @@ fun markdownToHtml(inputName: String, outputName: String) {
  *
  */
 fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+    val output = File(outputName).bufferedWriter()
+    val len = max((lhv * rhv).toString().length, rhv.toString().length + 1) + 1
+    output.write("%${len}s\n".format(lhv))
+    output.write("*%${len - 1}s\n".format(rhv))
+    output.write("-".repeat(len) + "\n")
+    val data = rhv.toString().toList().map { it.toString().toInt() }.reversed()
+    var plus = false
+    for (i in len downTo len - rhv.toString().length + 1)
+        if (plus) {
+            output.write("+%${i - 1}s\n".format(lhv * data[len - i]))
+        } else {
+            plus = true
+            output.write("%${i}s\n".format(lhv * data[len - i]))
+        }
+    output.write("-".repeat(len) + "\n")
+    output.write("%${len}s\n".format(rhv * lhv))
+    output.close()
 }
 
 
@@ -534,7 +555,6 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
-fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
+fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String = "") {
     TODO()
 }
-
