@@ -4,7 +4,6 @@ package lesson7.task1
 
 import java.io.File
 import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.pow
 
 /**
@@ -175,7 +174,10 @@ fun alignFileByWidth(inputName: String, outputName: String) {
     val outputStream = File(outputName).bufferedWriter()
     val data = File(inputName).readLines().map { it.trim() }
     if (data.isNotEmpty()) {
-        val targetLen = Regex("""\s+""").replace(data.maxBy { it -> it.filter { it != ' ' }.length }!!, " ").length
+        val targetLen = Regex("""\s+""").replace(
+            data.maxBy { it -> (it.filter { it != ' ' }.length + Regex("""\s+""").split(it).size) }!!,
+            " "
+        ).length
         for (string in data) {
             if (string.isEmpty() || " " !in string) {
                 outputStream.write(string + "\n")
@@ -192,6 +194,34 @@ fun alignFileByWidth(inputName: String, outputName: String) {
     }
     outputStream.close()
 }
+
+/**
+АЫАББ: АЫАББ: бабъч
+аыабб  аыабб; аыабб: аыабб
+бабъч; ВАВ; аыабб  ВАВ
+ВАВ
+бабъч
+аыабб
+БАБЪЧ - вАв / БАБЪЧ бабъч --
+
+АЫАББ:    АЫАББ:    бабъч
+аыабб аыабб; аыабб: аыабб
+бабъч;   ВАВ;  аыабб  ВАВ
+ВАВ
+бабъч
+аыабб
+БАБЪЧ - вАв /БАБЪЧбабъч--
+
+АЫАББ:      АЫАББ:     бабъч
+аыабб  аыабб;  аыабб:  аыабб
+бабъч;    ВАВ;   аыабб   ВАВ
+ВАВ
+бабъч
+аыабб
+БАБЪЧ - вАв / БАБЪЧ бабъч --
+
+
+ */
 
 
 /**
@@ -516,7 +546,7 @@ fun markdownToHtml(inputName: String, outputName: String) {
  */
 fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
     val output = File(outputName).bufferedWriter()
-    val len = max((lhv * rhv).toString().length, rhv.toString().length + 1) + 1
+    val len = max((lhv * rhv).toString().length, rhv.toString().length) + 1
     output.write("%${len}s\n".format(lhv))
     output.write("*%${len - 1}s\n".format(rhv))
     output.write("-".repeat(len) + "\n")
@@ -533,7 +563,6 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
     output.write("%${len}s\n".format(rhv * lhv))
     output.close()
 }
-
 
 /**
  * Сложная
