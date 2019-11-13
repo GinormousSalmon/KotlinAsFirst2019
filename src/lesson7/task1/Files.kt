@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+import java.util.*
 import kotlin.math.max
 import kotlin.math.pow
 
@@ -400,8 +401,105 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
-fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+
+fun markdownToHtmlSimple(inputName: String, outputName: String = "") {
+    val output = File(outputName).bufferedWriter()
+    val strings = File(inputName).readLines().toMutableList()
+    val stack = ArrayDeque<String>()
+    val equalities = mapOf("*" to Pair("<i>", "</i>"), "**" to Pair("<b>", "</b>"), "~~" to Pair("<s>", "</s>"))
+    val pattern = """([^*~])+""".toRegex()
+    val data = mutableListOf<String>()
+    val dataConverted = mutableListOf<String>()
+    for (string in strings)
+        pattern.split(string).filter { it.isNotEmpty() }
+            .forEach { if ("~" in it) data.addAll(split(it)) else data.add(it) }
+    var index = 0
+    val temp = data.toMutableList()
+    while (index < temp.size) {
+        if (temp[index] == stack.peek()) {
+            dataConverted.add(equalities.getValue(temp[index]).second)
+            stack.pop()
+        } else {
+            if (temp[index] == "***") {
+                if ("*" in stack.firstOrNull().toString()) {
+                    if (stack.peek() == "*") {
+                        stack.pop()
+                        dataConverted.add(equalities.getValue("*").second)
+                        temp.add(index + 1, "**")
+                    } else {
+                        stack.pop()
+                        dataConverted.add(equalities.getValue("**").second)
+                        temp.add(index + 1, "*")
+                    }
+                } else {
+                    stack.push("**")
+                    stack.push("*")
+                    dataConverted.add(equalities.getValue("**").first)
+                    dataConverted.add(equalities.getValue("*").first)
+                }
+            } else {
+                stack.push(temp[index])
+                dataConverted.add(equalities.getValue(temp[index]).first)
+            }
+        }
+        index += 1
+    }
+    index = 0
+    var offset = 0
+    for ((i, value) in data.withIndex()) {
+        while (index < strings.size) {
+            if (strings[index].contains(value)) {
+                strings[index] = if (value == "***") {
+                    offset += 1
+                    strings[index].replaceFirst(value, dataConverted[i + offset - 1] + dataConverted[i + offset])
+                } else {
+                    strings[index].replaceFirst(value, dataConverted[i + offset])
+                }
+                break
+            } else {
+                index += 1
+            }
+        }
+    }
+    output.write("<html>\n")
+    output.write("   <body>\n")
+    output.write("      <p>\n")
+    for (i in strings)
+        if (i == "")
+            output.write("      </p>\n      <p>\n")
+        else
+            output.write("         $i\n")
+    output.write("      </p>\n")
+    output.write("   </body>\n")
+    output.write("</html>\n")
+    output.close()
+}
+
+fun split(string: String): List<String> {
+    val result = mutableListOf<String>()
+    var temp = string[0].toString()
+    for (i in 1 until string.length) {
+        if (string[i] == string[i - 1]) {
+            temp += string[i]
+        } else {
+            result.add(temp)
+            temp = string[i].toString()
+        }
+    }
+    result.add(temp)
+    var index = 0
+    while (index < result.size) {
+        if ("~" in result[index] && result[index].length > 2) {
+            result.addAll(index + 1, List(result[index].length / 2) { "~~" })
+            result.removeAt(index)
+        }
+        index += 1
+    }
+    return result
+}
+
+fun main() {
+    markdownToHtmlSimple("input.txt", "out.txt")
 }
 
 /**
@@ -584,6 +682,42 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
-fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String = "") {
-    TODO()
+fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String = "1.txt") {
+    val output = File(outputName).bufferedWriter()
+    output.write(" $lhv | $rhv\n")
+    var first = true
+    var indent = 1
+    var subDividend = findSubDividend(lhv, rhv)
+    for (i in lhv.toString().split("").subList(len(subDividend) + 1, lhv.toString().lastIndex + 3)) {
+        val item = subDividend / rhv
+        output.write("%${indent}s".format("-${item * rhv}"))
+        if (first)
+            output.write(" ".repeat(len(lhv) - len(subDividend) + 3) + (lhv / rhv).toString())
+        output.newLine()
+        output.write("%${indent}s".format("-".repeat(len(item * rhv) + 1)) + "\n")
+        if (first) {
+            first = false
+            indent = len(item * rhv) + 2
+        } else {
+            indent += 1
+        }
+        if (i != "") {
+            output.write("%${indent}s".format((subDividend - item * rhv).toString() + i) + "\n")
+            subDividend = (subDividend - item * rhv) * 10 + i.toInt()
+        } else {
+            output.write("%${indent - 1}s".format((subDividend - item * rhv)))
+        }
+    }
+    output.close()
+}
+
+fun len(a: Int): Int = a.toString().length
+
+fun pow(a: Int, b: Int): Int = a.toDouble().pow(b).toInt()
+
+fun findSubDividend(a: Int, b: Int): Int {
+    var divider = pow(10, a.toString().length - 1)
+    while (a / divider < b && divider != 1)
+        divider /= 10
+    return a / divider
 }

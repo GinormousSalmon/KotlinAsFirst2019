@@ -61,6 +61,7 @@ fun circleInside(
     x2: Double, y2: Double, r2: Double
 ): Boolean = sqrt((x1 - x2).pow(2) + (y1 - y2).pow(2)) <= (r2 - r1)
 
+
 /**
  * Средняя
  *
