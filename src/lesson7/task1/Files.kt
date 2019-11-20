@@ -464,11 +464,20 @@ fun markdownToHtmlSimple(inputName: String, outputName: String = "") {
     output.write("<html>\n")
     output.write("   <body>\n")
     output.write("      <p>\n")
+    var paragraph = true
     for (i in strings)
-        if (i == "")
-            output.write("      </p>\n      <p>\n")
-        else
+        if (i == "") {
+            if (paragraph) {
+                output.write("      </p>\n")
+                paragraph = false
+            }
+        } else {
+            if (!paragraph) {
+                output.write("      <p>\n")
+                paragraph = true
+            }
             output.write("         $i\n")
+        }
     output.write("      </p>\n")
     output.write("   </body>\n")
     output.write("</html>\n")
@@ -496,10 +505,6 @@ fun split(string: String): List<String> {
         index += 1
     }
     return result
-}
-
-fun main() {
-    markdownToHtmlSimple("input.txt", "out.txt")
 }
 
 /**
@@ -601,7 +606,7 @@ fun main() {
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
-fun markdownToHtmlLists(inputName: String, outputName: String) {
+fun markdownToHtmlLists(inputName: String = "", outputName: String = "") {
     TODO()
 }
 
@@ -682,30 +687,35 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
-fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String = "1.txt") {
+fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val output = File(outputName).bufferedWriter()
-    output.write(" $lhv | $rhv\n")
+    var subDiv = findSubDividend(lhv, rhv)
     var first = true
-    var indent = 1
-    var subDividend = findSubDividend(lhv, rhv)
-    for (i in lhv.toString().split("").subList(len(subDividend) + 1, lhv.toString().lastIndex + 3)) {
-        val item = subDividend / rhv
+    var indent = len(subDiv)
+    var oldPos = 0
+    if (len(subDiv) == len(subDiv / rhv * rhv))
+        output.write(" ")
+    output.write("$lhv | $rhv\n")
+    for (str in lhv.toString().split("").subList(len(subDiv) + 1, lhv.toString().lastIndex + 3)) {
+        val item = subDiv / rhv
         output.write("%${indent}s".format("-${item * rhv}"))
         if (first)
-            output.write(" ".repeat(len(lhv) - len(subDividend) + 3) + (lhv / rhv).toString())
+            output.write(" ".repeat(len(lhv) - len(subDiv) + 3) + (lhv / rhv).toString())
         output.newLine()
-        output.write("%${indent}s".format("-".repeat(len(item * rhv) + 1)) + "\n")
+        val n = indent - oldPos + (constrain(len(subDiv), 2 - first.toInt()) == len(item * rhv)).toInt()
+        output.write("%${indent}s".format("-".repeat(n)) + "\n")
         if (first) {
             first = false
             indent = len(item * rhv) + 2
         } else {
             indent += 1
         }
-        if (i != "") {
-            output.write("%${indent}s".format((subDividend - item * rhv).toString() + i) + "\n")
-            subDividend = (subDividend - item * rhv) * 10 + i.toInt()
+        if (str != "") {
+            output.write("%${indent}s".format((subDiv - item * rhv).toString() + str) + "\n")
+            oldPos = indent - len(subDiv - item * rhv) - 1
+            subDiv = (subDiv - item * rhv) * 10 + str.toInt()
         } else {
-            output.write("%${indent - 1}s".format((subDividend - item * rhv)))
+            output.write("%${indent - 1}s".format((subDiv - item * rhv)))
         }
     }
     output.close()
@@ -721,3 +731,5 @@ fun findSubDividend(a: Int, b: Int): Int {
         divider /= 10
     return a / divider
 }
+
+fun constrain(num: Int, min: Int) = if (num < min) min else num
