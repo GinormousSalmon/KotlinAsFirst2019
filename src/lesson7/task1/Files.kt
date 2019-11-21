@@ -402,7 +402,7 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 
-fun markdownToHtmlSimple(inputName: String, outputName: String = "") {
+fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val output = File(outputName).bufferedWriter()
     val strings = File(inputName).readLines().toMutableList()
     val stack = ArrayDeque<String>()
@@ -463,8 +463,9 @@ fun markdownToHtmlSimple(inputName: String, outputName: String = "") {
     }
     output.write("<html>\n")
     output.write("   <body>\n")
-    output.write("      <p>\n")
-    var paragraph = true
+    if (strings[0] != "")
+        output.write("      <p>\n")
+    var paragraph = strings[0] != ""
     for (i in strings)
         if (i == "") {
             if (paragraph) {
@@ -506,6 +507,7 @@ fun split(string: String): List<String> {
     }
     return result
 }
+
 
 /**
  * Сложная
