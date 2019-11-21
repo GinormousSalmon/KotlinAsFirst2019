@@ -463,22 +463,24 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     }
     output.write("<html>\n")
     output.write("   <body>\n")
-    if (strings[0] != "")
-        output.write("      <p>\n")
-    var paragraph = strings[0] != ""
-    for (i in strings)
-        if (i == "") {
-            if (paragraph) {
-                output.write("      </p>\n")
-                paragraph = false
+    output.write("      <p>\n")
+    val start = strings.indexOfFirst { it != "" }
+    val end = strings.indexOfLast { it != "" }
+    if (strings.isNotEmpty()) {
+        var oldStr = strings[0]
+        for ((i, value) in strings.withIndex()) {
+            if (oldStr == "" && value != "") {
+                if (i > start)
+                    output.write("      <p>\n")
+            } else {
+                if (oldStr != "" && value == "")
+                    if (i < end)
+                        output.write("      </p>\n")
             }
-        } else {
-            if (!paragraph) {
-                output.write("      <p>\n")
-                paragraph = true
-            }
-            output.write("         $i\n")
+            output.write("         $value\n")
+            oldStr = value
         }
+    }
     output.write("      </p>\n")
     output.write("   </body>\n")
     output.write("</html>\n")

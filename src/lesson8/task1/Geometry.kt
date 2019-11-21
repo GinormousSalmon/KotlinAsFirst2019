@@ -3,6 +3,7 @@
 package lesson8.task1
 
 import lesson1.task1.sqr
+import lesson2.task2.pointInsideCircle
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -79,15 +80,20 @@ data class Circle(val center: Point, val radius: Double) {
      * расстояние между их центрами минус сумма их радиусов.
      * Расстояние между пересекающимися окружностями считать равным 0.0.
      */
-    fun distance(other: Circle): Double = TODO()
+    fun distance(other: Circle): Double =
+        constrain(Point(center.x, center.y).distance(Point(other.center.x, other.center.y)) - radius - other.radius)
+
+    private fun constrain(num: Double) = if (num < 0.0) 0.0 else num
+
 
     /**
      * Тривиальная
      *
      * Вернуть true, если и только если окружность содержит данную точку НА себе или ВНУТРИ себя
      */
-    fun contains(p: Point): Boolean = TODO()
+    fun contains(p: Point): Boolean = pointInsideCircle(p.x, p.y, center.x, center.y, radius)
 }
+
 
 /**
  * Отрезок между двумя точками
