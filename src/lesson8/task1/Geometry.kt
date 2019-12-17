@@ -173,7 +173,10 @@ fun lineBySegment(s: Segment): Line {
  * Построить прямую по двум точкам
  */
 fun lineByPoints(a: Point, b: Point): Line {
-    val ang = atan((b.y - a.y) / (b.x - a.x))
+    val ang = if (b.x - a.x == 0.0)
+        PI / 2
+    else
+        atan((b.y - a.y) / (b.x - a.x))
     return Line(a, ang)
 }
 
