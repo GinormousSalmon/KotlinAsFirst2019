@@ -169,7 +169,7 @@ fun lineBySegment(s: Segment): Line {
         atan((s.end.y - s.begin.y) / (s.end.x - s.begin.x))
     if (ang < 0)
         ang += PI
-    return Line(s.begin, ang)
+    return Line(s.begin, ang % PI)
 }
 
 /**
@@ -184,7 +184,7 @@ fun lineByPoints(a: Point, b: Point): Line {
         atan((b.y - a.y) / (b.x - a.x))
     if (ang < 0)
         ang += PI
-    return Line(a, ang)
+    return Line(a, ang % PI)
 }
 
 /**
